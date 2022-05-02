@@ -47,12 +47,13 @@ public class HCollege {
             JPanel SCREEN = new JPanel();
             SCREEN.setPreferredSize(new Dimension(FRAMEWIDTH, FRAMEHEIGHT));
             SCREEN.setLayout(new FlowLayout(5, 5, 5));
+            SCREEN.setBackground(new Color(0, 0, 0));
 
             JPanel MAINSCREEN = new JPanel();
             MAINSCREEN.setPreferredSize(new Dimension(FRAMEWIDTH - 15, FRAMEHEIGHT - 85));
             MAINSCREEN.setBorder(BorderFactory.createTitledBorder("Screen"));
             MAINSCREEN.setLayout(new FlowLayout(5, 5, 5));
-            MAINSCREEN.setBackground(new Color(255, 255, 255));
+            MAINSCREEN.setBackground(new Color(33, 255, 255));
 
             JPanel BOTTOMSCREEN = new JPanel();
             BOTTOMSCREEN.setPreferredSize(new Dimension(FRAMEWIDTH - 15, 70));
