@@ -1,14 +1,11 @@
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
+import java.awt.event.*;
+import org.apache.commons.lang3.*;
+import org.jsoup.*;
 import netscape.javascript.JSObject;
-
+import org.jsoup.nodes.*;  
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONString;
@@ -17,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.io.File;
 import java.io.FileWriter;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.HashMap;
@@ -47,21 +44,53 @@ public class HCollege {
             JPanel SCREEN = new JPanel();
             SCREEN.setPreferredSize(new Dimension(FRAMEWIDTH, FRAMEHEIGHT));
             SCREEN.setLayout(new FlowLayout(5, 5, 5));
-            SCREEN.setBackground(new Color(0, 0, 0));
+            SCREEN.setBackground(new Color(255, 255, 255));
 
             JPanel MAINSCREEN = new JPanel();
-            MAINSCREEN.setPreferredSize(new Dimension(FRAMEWIDTH - 15, FRAMEHEIGHT - 85));
-            MAINSCREEN.setBorder(BorderFactory.createTitledBorder("Screen"));
+            MAINSCREEN.setPreferredSize(new Dimension(FRAMEWIDTH - 15, FRAMEHEIGHT - 100));
+            MAINSCREEN.setBorder(BorderFactory.createTitledBorder("Details Screen"));
             MAINSCREEN.setLayout(new FlowLayout(5, 5, 5));
-            MAINSCREEN.setBackground(new Color(33, 255, 255));
+            MAINSCREEN.setBackground(new Color(255, 255, 255));
 
             JPanel BOTTOMSCREEN = new JPanel();
+            BOTTOMSCREEN.setBorder(BorderFactory.createEmptyBorder(10, 1, 1, 1));
             BOTTOMSCREEN.setPreferredSize(new Dimension(FRAMEWIDTH - 15, 70));
             BOTTOMSCREEN.setLayout(new FlowLayout(5, 5, 5));
             BOTTOMSCREEN.setBackground(new Color(255, 255, 255));
 
             JTextField SEARCHTEXT = new JTextField("");
             SEARCHTEXT.setPreferredSize(new Dimension(FRAMEWIDTH - 400, 30));
+            SEARCHTEXT.setFont(new Font("Arial", Font.BOLD, 16));
+
+            SEARCHTEXT.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    try{
+                        File file = FileUtils.getFile("details.txt");
+                        FileUtils.write(file, "", StandardCharsets.UTF_8);
+    
+    
+                        String QUERY = SEARCHTEXT.getText();
+                        Crawl(TEXTSEARCH_URL + "&query=" + QUERY.replaceAll(" ", "%20"));
+    
+                        JSONArray DATABASE = getAddressFile();
+                        JSONLISTMODEL.removeAllElements();
+    
+                        for (int i = 0; i < DATABASE.length(); i++) {
+                            JSONObject JSONOBJECT = (JSONObject) DATABASE.getJSONObject(i);
+                            JSONLISTMODEL.addElement(JSONOBJECT.get("name") + " ( " + JSONOBJECT.get("address") + " ) ");
+    
+                        }
+                    } catch(Exception exception){
+                        System.out.println(exception);
+                    }
+                }
+            }
+
+             });
+
+             
             BOTTOMSCREEN.add(SEARCHTEXT);
 
             String BName = "Get";
@@ -74,31 +103,40 @@ public class HCollege {
 
             BUTTON.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    BUTTON.setEnabled(false);
+                    try{
+                        BUTTON.setEnabled(false);
 
-                    File file = FileUtils.getFile("details.txt");
-
-                    FileUtils.deleteQuietly(file);
-
-                    String QUERY = SEARCHTEXT.getText();
-                    Crawl(TEXTSEARCH_URL + "&query=" + QUERY.replaceAll(" ", "%20"));
-
-                    JSONArray DATABASE = getAddressFile();
-
-                    for (int i = 0; i < DATABASE.length(); i++) {
-                        JSONObject JSONOBJECT = (JSONObject) DATABASE.getJSONObject(i);
-                        JSONLISTMODEL.addElement(JSONOBJECT.get("name") + " ( " + JSONOBJECT.get("address") + " ) ");
-
+                        File file = FileUtils.getFile("details.txt");
+                        FileUtils.write(file, "", StandardCharsets.UTF_8);
+    
+    
+                        String QUERY = SEARCHTEXT.getText();
+                        Crawl(TEXTSEARCH_URL + "&query=" + QUERY.replaceAll(" ", "%20"));
+    
+                        JSONArray DATABASE = getAddressFile();
+                        JSONLISTMODEL.removeAllElements();
+    
+                        for (int i = 0; i < DATABASE.length(); i++) {
+                            JSONObject JSONOBJECT = (JSONObject) DATABASE.getJSONObject(i);
+                            JSONLISTMODEL.addElement(JSONOBJECT.get("name") + " ( " + JSONOBJECT.get("address") + " ) ");
+    
+                        }
+                        BUTTON.setEnabled(true);
+    
+                    } catch(Exception e){
+                        System.out.println(e);
                     }
-                    BUTTON.setEnabled(true);
-
+                    
                 }
             });
 
             JList JSONLIST = new JList(JSONLISTMODEL);
+            JSONLIST.setBackground(new Color(255, 255, 255));
+            JSONLIST.setPreferredSize(new Dimension(FRAMEWIDTH - 25, FRAMEHEIGHT - 120));
+            JSONLIST.setBorder(BorderFactory.createEmptyBorder(0, 1, 10, 1));
+
             JScrollPane JSONSCROLL = new JScrollPane(JSONLIST);
-            JSONSCROLL.setPreferredSize(new Dimension(FRAMEWIDTH - 45, FRAMEHEIGHT - 110));
-            JSONSCROLL.setBorder(null);
+            JSONSCROLL.setPreferredSize(new Dimension(FRAMEWIDTH - 30, FRAMEHEIGHT - 130));
             JSONSCROLL.setForeground(new Color(0, 0, 0));
             MAINSCREEN.add(JSONSCROLL);
 
@@ -131,7 +169,7 @@ public class HCollege {
             GetResults(JSONOBJECT);
 
         } catch (Exception ex) {
-            System.out.println(ex);
+            System.out.println("ERROR : HCollege : Crawl() : " + ex);
         }
     }
 
